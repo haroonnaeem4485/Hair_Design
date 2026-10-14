@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLIENT BUSINESS - Price Calculator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
+body{min-height:100vh;background:#000;display:flex;justify-content:center;align-items:center;padding:20px}
+.card{width:100%;max-width:480px;background:#0A0A0A;border:1px solid #262626;border-radius:16px;padding:28px;box-shadow:0 0 30px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.05)}
+h1{color:#fff;font-size:26px} h1 span{color:#A3A3A3} .sub{color:#737373;font-size:13px;margin:8px 0 20px}
+.bar{height:3px;background:#171717;border-radius:10px;overflow:hidden;margin-bottom:20px} .fill{height:100%;background:#fff;width:33%;transition:.3s}
+label{color:#A3A3A3;font-size:13px;display:block;margin:14px 0 6px}
+input,select{width:100%;padding:12px 14px;border-radius:8px;background:#171717;border:1px solid #262626;color:#fff;outline:none}
+input:focus{border-color:#525252}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.opt{padding:11px;border-radius:8px;background:#171717;border:1px solid #262626;color:#fff;text-align:center;cursor:pointer;font-size:14px}
+.opt.active{background:#fff;color:#000;border-color:#fff}
+.price{margin-top:18px;background:#FAFAFA;color:#000;padding:16px;border-radius:12px;text-align:center}
+.price h2{font-size:30px} .btn{width:100%;margin-top:18px;padding:13px;background:#fff;color:#000;border:none;border-radius:8px;font-weight:700;cursor:pointer}
+.hidden{display:none} .note{color:#525252;font-size:11px;text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="card">
+<h1 id="bizTitle">Your Business <span>Calculator</span></h1>
+<p class="sub" id="step">Step 1 of 3</p>
+<div class="bar"><div class="fill" id="fill"></div></div>
+
+<div id="s1">
+<label>Apka Naam</label>
+<input id="cName" placeholder="Apna naam likhein">
+<label>Service Select Karein</label>
+<div class="opts" id="sOpts">
+<div class="opt" data-p="1000" onclick="sel(this)">Haircut</div>
+<div class="opt" data-p="1500" onclick="sel(this)">Beard + Hair</div>
+<div class="opt" data-p="2500" onclick="sel(this)">Bridal Package</div>
+<div class="opt" data-p="800" onclick="sel(this)">Facial</div>
+</div>
+<button class="btn" onclick="go(2)">Next</button>
+</div>
+
+<div id="s2" class="hidden">
+<label>Extra Add Karein</label>
+<div class="opts">
+<div class="opt" data-p="500" onclick="this.classList.toggle('active');calc()">Home Service +500</div>
+<div class="opt" data-p="300" onclick="this.classList.toggle('active');calc()">Fast Service +300</div>
+</div>
+<div class="price"><small>Estimated</small><h2>Rs. <span id="est">0</span></h2></div>
+<button class="btn" onclick="go(3)">Next</button>
+</div>
+
+<div id="s3" class="hidden">
+<label>Apka WhatsApp Number</label>
+<input id="cPhone" placeholder="0300xxxxxxx">
+<div class="price"><small>Final Bill</small><h2>Rs. <span id="final">0</span></h2></div>
+<button class="btn" onclick="send()">WhatsApp Par Bhejo →</button>
+<p class="note">Apka data mehfooz hai, sirf shop owner ko jayega</p>
+</div>
+
+<div id="done" class="hidden" style="text-align:center;color:#fff">
+<h2>Shukria! ✅</h2><p style="color:#A3A3A3;margin-top:8px">Apki request bhej di gayi hai, owner apse rabta karega.</p>
+</div>
+</div>
+
+<script>
+// ====== YAHAN CLIENT KA DATA CHANGE KARO - BAS YE 2 LINES ======
+const BUSINESS_NAME = "Zain Salon Lahore"; // Yahan client ka naam likho
+const OWNER_WHATSAPP = "923001234567"; // Yahan client ka WhatsApp number (92 ke sath) likho
+// ==============================================================
+
+document.getElementById('bizTitle').innerHTML = BUSINESS_NAME + ' <span>Calculator</span>';
+let basePrice=0, extra=0, serviceName='';
+function sel(el){
+document.querySelectorAll('#sOpts .opt').forEach(o=>o.classList.remove('active'));
+el.classList.add('active'); basePrice=parseInt(el.dataset.p); serviceName=el.innerText; calc();
+}
+function calc(){
+extra=0;
+document.querySelectorAll('#s2 .opt.active').forEach(o=> extra+=parseInt(o.dataset.p));
+let t=basePrice+extra;
+document.getElementById('est').innerText=t;
+document.getElementById('final').innerText=t;
+}
+function go(n){
+if(n==2 && basePrice==0){alert('Service select karo');return}
+document.getElementById('s1').classList.add('hidden');
+document.getElementById('s2').classList.add('hidden');
+document.getElementById('s3').classList.add('hidden');
+document.getElementById('s'+n).classList.remove('hidden');
+document.getElementById('fill').style.width=(n*33)+'%';
+document.getElementById('step').innerText='Step '+n+' of 3';
+if(n==2) calc();
+}
+function send(){
+let name=document.getElementById('cName').value;
+let phone=document.getElementById('cPhone').value;
+if(!name||!phone){alert('Naam aur number likho');return}
+let final=document.getElementById('final').innerText;
+let msg=`New Lead from ${BUSINESS_NAME}%0AName: ${name}%0AService: ${serviceName}%0APrice: Rs. ${final}%0ACustomer Phone: ${phone}`;
+window.open(`https://wa.me/${OWNER_WHATSAPP}?text=${msg}`,'_blank');
+document.getElementById('s3').classList.add('hidden');
+document.getElementById('done').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
